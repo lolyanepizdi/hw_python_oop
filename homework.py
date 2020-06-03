@@ -34,19 +34,18 @@ class CashCalculator(Calculator):
 		super().__init__(limit)
 
 	def get_today_cash_remained(self, currency):
-		self.currency_dict = {
+		currency_dict = {
                     'eur': [self.EURO_RATE, 'Euro'],
                     'usd': [self.USD_RATE, 'USD'],
                     'rub': [self.RUB_RATE, 'руб']
                 }
-		self.balance = round((self.limit - self.get_today_stats()
-                        ) / self.currency_dict[currency][0], 2)
+		balance = round((self.limit - self.get_today_stats()) / currency_dict[currency][0], 2)
 		if self.count_today < self.limit:
-			return f'На сегодня осталось {self.balance} {self.currency_dict[currency][1]}'
+			return f'На сегодня осталось {balance} {currency_dict[currency][1]}'
 		elif self.count_today == self.limit:
 			return f'Денег нет, держись'
 		elif self.count_today > self.limit:
-			return f'Денег нет, держись: твой долг - {-self.balance} {self.currency_dict[currency][1]}'
+			return f'Денег нет, держись: твой долг - {-balance} {currency_dict[currency][1]}'
 
 
 class CaloriesCalculator(Calculator):
@@ -56,7 +55,8 @@ class CaloriesCalculator(Calculator):
 	def get_calories_remained(self):
 		self.calories = self.limit - self.get_today_stats()
 		if self.count_today < self.limit:
-			return f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {self.limit - self.count_today} кКал'
+			return f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более ' \
+                   f'{self.limit - self.count_today} кКал'
 		else:
 			return 'Хватит есть!'
 
@@ -69,20 +69,3 @@ class Record:
 			self.date = dt.datetime.now().date()
 		else:
 			self.date = dt.datetime.strptime(date, '%d.%m.%Y').date()
-
-
-# создадим калькулятор денег с дневным лимитом 1000
-cash_calculator = CashCalculator(1000)
-
-# дата в параметрах не указана,
-# так что по умолчанию к записи должна автоматически добавиться сегодняшняя дата
-cash_calculator.add_record(Record(amount=1450, comment="кофе"))
-# и к этой записи тоже дата должна добавиться автоматически
-cash_calculator.add_record(Record(amount=300, comment="Серёге за обед"))
-# а тут пользователь указал дату, сохраняем её
-cash_calculator.add_record(
-	Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
-
-print(cash_calculator.get_today_cash_remained("rub"))
-# должно напечататься
-# На сегодня осталось 555 руб
